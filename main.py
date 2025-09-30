@@ -76,9 +76,6 @@ cn.display_app_title()
 if not st.session_state.messages:
     cn.display_initial_main_messages()
 
-# StreamlitのカスタムCSSを適用し、メインエリアに縦スクロールを設定する
-cn.apply_custom_css()
-
 # 会話ログを表示するための場所を確保
 chat_container = st.container()
 

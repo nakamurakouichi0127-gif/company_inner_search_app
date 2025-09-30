@@ -359,35 +359,3 @@ def display_contact_llm_response(llm_response):
 
     return content
 
-def apply_custom_css():
-    """
-    画面右側のチャットエリアのみをスクロール可能にするためのカスタムCSSを適用
-    """
-    st.markdown(
-        # CSSを適用するためのタグ
-        """
-        <style>
-        /* 画面右側のメインコンテンツエリア（.stApp > header + div）を対象とする */
-        /* Streamlitのメインエリアを特定するキーセレクタを使用 */
-        .stApp > header + div {
-            /* 最大の高さを設定（ビューポートの高さの100%から、ヘッダーと下部のチャット入力欄の高さを引く） */
-            /* 100vh - 70px (ヘッダー) - 100px (チャット入力) = 縦スクロールが発生するエリアの高さ */
-            max-height: calc(100vh - 170px);
-            /* overflow-y: auto; で縦スクロールを有効にする */
-            overflow-y: auto;
-            padding-bottom: 50px; /* スクロール時に下部が見切れないように余白を追加 */
-        }
-        /* チャット入力欄（画面下部に固定される要素）の調整 */
-        .stApp > footer {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            padding: 1rem;
-            background-color: white; /* 背景色を設定して、チャットエリアの内容が透けないようにする */
-            z-index: 10;
-        }
-        </style>
-        """,
-        unsafe_allow_html=True
-    )

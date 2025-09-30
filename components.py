@@ -26,22 +26,17 @@ def display_select_mode():
     回答モードのラジオボタンを表示
     """
     # 回答モードを選択する用のラジオボタンを表示
-    # col1, col2 = st.columns([100, 1])
-    # with col1:
-    #     # 「label_visibility="collapsed"」とすることで、ラジオボタンを非表示にする
-    #     st.session_state.mode = st.radio(
-    #         label="",
-    #         options=[ct.ANSWER_MODE_1, ct.ANSWER_MODE_2],
-    #         label_visibility="collapsed"
-    #     )
+    col1, col2 = st.columns([100, 1])
+    with col1:
+        # 「label_visibility="collapsed"」とすることで、ラジオボタンを非表示にする
+        st.markdown("**利用目的**")
+        st.session_state.mode = st.radio(
+            label="",
+            options=[ct.ANSWER_MODE_1, ct.ANSWER_MODE_2],
+            label_visibility="collapsed"
+        )
     
-    # サイドバー内で使用するため、列調整を削除し、シンプルにラジオボタンを表示
-    st.markdown("**利用目的**")
-    st.session_state.mode = st.radio(
-        label="",
-        options=[ct.ANSWER_MODE_1, ct.ANSWER_MODE_2],
-        label_visibility="collapsed"
-    )
+    # 区切り線の表示
 
     st.markdown("---") 
 
@@ -70,9 +65,10 @@ def display_initial_main_messages():
     """
     メインエリアに初期メッセージ（挨拶とアドバイス）を表示
     """
-    # st.success()で緑色のボックスを、st.warning()で黄色のボックスを表示します
-    st.success("こんにちは。私は社内文書の情報をもとに回答する生成AIチャットボットです。サイドバーで利用目的を選択し、画面下部のチャット欄からメッセージを送信してください。")
-    st.warning("具体的な入力のほうが期待通りの回答を得やすいです。")
+    with st.chat_message("assistant"):
+        # st.success()で緑色のボックスを、st.warning()で黄色のボックスを表示します
+        st.success("こんにちは。私は社内文書の情報をもとに回答する生成AIチャットボットです。サイドバーで利用目的を選択し、画面下部のチャット欄からメッセージを送信してください。")
+        st.warning("具体的な入力のほうが期待通りの回答を得やすいです。")
 
 
 def display_sidebar_guide():

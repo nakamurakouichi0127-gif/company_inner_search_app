@@ -8,6 +8,7 @@
 from langchain_community.document_loaders import PyMuPDFLoader, Docx2txtLoader, TextLoader
 from langchain_community.document_loaders.csv_loader import CSVLoader
 
+
 ############################################################
 # 共通変数の定義
 ############################################################
@@ -116,6 +117,6 @@ DISP_ANSWER_ERROR_MESSAGE = "回答表示に失敗しました。"
 # ベクターストアから取り出す関連ドキュメントの数
 SEARCH_K_DEFAULT = 5 
 # ドキュメント分割時のチャンクサイズ（文字数）
-CHUNK_SIZE_DEFAULT = 500
+CHUNK_SIZE_DEFAULT = 1000
 # ドキュメント分割時のチャンクの重複サイズ（文字数）
-CHUNK_OVERLAP_DEFAULT = 50
+CHUNK_OVERLAP_DEFAULT = 100

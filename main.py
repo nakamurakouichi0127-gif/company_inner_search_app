@@ -56,54 +56,29 @@ if not "initialized" in st.session_state:
 ############################################################
 # 4. 初期表示
 ############################################################
-# # タイトル表示
-# cn.display_app_title()
-
-# # モード表示
-# cn.display_select_mode()
-
-# # AIメッセージの初期表示
-# cn.display_initial_ai_message()
-
-# ==========================================
-# 4-1. メインエリア（画面の右側チャットエリア）の定義
-# ==========================================
-# タイトルをメインエリアに表示
+# タイトル表示
 cn.display_app_title()
 
-# チャット履歴がない場合に、メインエリアに初期メッセージを表示
-# (この後、components.pyで新しい関数を定義します)
-if not st.session_state.messages:
-    cn.display_initial_main_messages()
+# モード表示
+cn.display_select_mode()
 
-# 会話ログを表示するための場所を確保
-chat_container = st.container()
+# AIメッセージの初期表示
+cn.display_initial_ai_message()
 
-
-# ==========================================
-# 4-2. サイドバー（画面の左側固定エリア）の定義
-# ==========================================
-with st.sidebar:
-    # 回答モードのラジオボタンを表示
-    cn.display_select_mode()
-    # 機能説明と入力例を表示
-    # (この後、components.pyで古い関数を改造して新しい関数を作ります)
-    cn.display_sidebar_guide()
 
 ############################################################
 # 5. 会話ログの表示
 ############################################################
-with chat_container:
-    try:
-        # 会話ログの表示
-        cn.display_conversation_log()
-    except Exception as e:
-        # エラーログの出力
-        logger.error(f"{ct.CONVERSATION_LOG_ERROR_MESSAGE}\n{e}")
-        # エラーメッセージの画面表示
-        st.error(utils.build_error_message(ct.CONVERSATION_LOG_ERROR_MESSAGE), icon=ct.ERROR_ICON)
-        # 後続の処理を中断
-        st.stop()
+try:
+    # 会話ログの表示
+    cn.display_conversation_log()
+except Exception as e:
+    # エラーログの出力
+    logger.error(f"{ct.CONVERSATION_LOG_ERROR_MESSAGE}\n{e}")
+    # エラーメッセージの画面表示
+    st.error(utils.build_error_message(ct.CONVERSATION_LOG_ERROR_MESSAGE), icon=ct.ERROR_ICON)
+    # 後続の処理を中断
+    st.stop()
 
 
 ############################################################

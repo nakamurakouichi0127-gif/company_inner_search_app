@@ -22,70 +22,63 @@ def display_app_title():
 
 
 def display_select_mode():
+    # """
+    # 回答モードのラジオボタンを表示
+    # """
+    # # 回答モードを選択する用のラジオボタンを表示
+    # col1, col2 = st.columns([100, 1])
+    # with col1:
+    #     # 「label_visibility="collapsed"」とすることで、ラジオボタンを非表示にする
+    #     st.session_state.mode = st.radio(
+    #         label="",
+    #         options=[ct.ANSWER_MODE_1, ct.ANSWER_MODE_2],
+    #         label_visibility="collapsed"
+    #     )
     """
-    回答モードのラジオボタンを表示
+    サイドバーの要素を表示
     """
-    # 回答モードを選択する用のラジオボタンを表示
-    col1, col2 = st.columns([100, 1])
-    with col1:
-        # 「label_visibility="collapsed"」とすることで、ラジオボタンを非表示にする
-        st.markdown("**利用目的**")
-        st.session_state.mode = st.radio(
-            label="",
-            options=[ct.ANSWER_MODE_1, ct.ANSWER_MODE_2],
-            label_visibility="collapsed"
-        )
-    
-    # 区切り線の表示
+    # st.sidebar を使うことで、全ての要素がサイドバーに表示される
+    st.sidebar.title("利用目的")
 
-    st.markdown("---") 
+    # サイドバーにラジオボタンを配置
+    st.session_state.mode = st.sidebar.radio(
+        label="利用目的を選択",  # ラジオボタンのラベル
+        options=[ct.ANSWER_MODE_1, ct.ANSWER_MODE_2],
+        label_visibility="collapsed" # ラベルは非表示のまま
+    )
 
-# def display_initial_ai_message():
-#     """
-#     AIメッセージの初期表示
-#     """
-#     with st.chat_message("assistant"):
-#         # 「st.success()」とすると緑枠で表示される
-#         st.markdown("こんにちは。私は社内文書の情報をもとに回答する生成AIチャットボットです。上記で利用目的を選択し、画面下部のチャット欄からメッセージを送信してください。")
+    # 「社内文書検索」の機能説明をサイドバーに表示
+    st.sidebar.markdown("---") # 区切り線
+    st.sidebar.markdown(f"**【「{ct.ANSWER_MODE_1}」を選択した場合】**")
+    st.sidebar.info("入力内容と関連性が高い社内文書のありかを検索できます。")
+    st.sidebar.code("【入力例】\n社員の育成方針に関するMTGの議事録", language=None)
 
-#         # 「社内文書検索」の機能説明
-#         st.markdown("**【「社内文書検索」を選択した場合】**")
-#         # 「st.info()」を使うと青枠で表示される
-#         st.info("入力内容と関連性が高い社内文書のありかを検索できます。")
-#         # 「st.code()」を使うとコードブロックの装飾で表示される
-#         # 「wrap_lines=True」で折り返し設定、「language=None」で非装飾とする
-#         st.code("【入力例】\n社員の育成方針に関するMTGの議事録", wrap_lines=True, language=None)
+    # 「社内問い合わせ」の機能説明をサイドバーに表示
+    st.sidebar.markdown(f"**【「{ct.ANSWER_MODE_2}」を選択した場合】**")
+    st.sidebar.info("質問・要望に対して、社内文書の情報をもとに回答を得られます。")
+    st.sidebar.code("【入力例】\n人事部に所属している従業員情報を一覧化して", language=None)
 
-#         # 「社内問い合わせ」の機能説明
-#         st.markdown("**【「社内問い合わせ」を選択した場合】**")
-#         st.info("質問・要望に対して、社内文書の情報をもとに回答を得られます。")
-#         st.code("【入力例】\n人事部に所属している従業員情報を一覧化して", wrap_lines=True, language=None)
-
-def display_initial_main_messages():
+def display_initial_ai_message():
     """
-    メインエリアに初期メッセージ（挨拶とアドバイス）を表示
+    AIメッセージの初期表示
     """
     with st.chat_message("assistant"):
-        # st.success()で緑色のボックスを、st.warning()で黄色のボックスを表示します
-        st.success("こんにちは。私は社内文書の情報をもとに回答する生成AIチャットボットです。サイドバーで利用目的を選択し、画面下部のチャット欄からメッセージを送信してください。")
-        st.warning("具体的な入力のほうが期待通りの回答を得やすいです。")
+        # 「st.success()」とすると緑枠で表示される
+        st.success("こんにちは。私は社内文書の情報をもとに回答する生成AIチャットボットです。上記で利用目的を選択し、画面下部のチャット欄からメッセージを送信してください。")
+        st.warning("具体的に入力したほうが期待通りの回答を得やすいです。", icon=ct.WARNING_ICON)
 
+        # # 「社内文書検索」の機能説明
+        # st.markdown("**【「社内文書検索」を選択した場合】**")
+        # # 「st.info()」を使うと青枠で表示される
+        # st.info("入力内容と関連性が高い社内文書のありかを検索できます。")
+        # # 「st.code()」を使うとコードブロックの装飾で表示される
+        # # 「wrap_lines=True」で折り返し設定、「language=None」で非装飾とする
+        # st.code("【入力例】\n社員の育成方針に関するMTGの議事録", wrap_lines=True, language=None)
 
-def display_sidebar_guide():
-    """
-    サイドバーに機能説明と入力例を表示
-    """
-    # 「社内文書検索」の機能説明
-    st.markdown("**【「社内文書検索」を選択した場合】**")
-    # 「st.info()」を使うと青枠（テーマによってはグレー）で表示されます
-    st.info("入力内容と関連性が高い社内文書のありかを検索できます。")
-    # 「st.code()」を使うとコードブロックの装飾で表示されます
-    st.code("【入力例】\n社員の育成方針に関するMTGの議事録", language=None)
-
-    # 「社内問い合わせ」の機能説明
-    st.markdown("**【「社内問い合わせ」を選択した場合】**")
-    st.info("質問・要望に対して、社内文書の情報をもとに回答を得られます。")
-    st.code("【入力例】\n人事部に所属している従業員情報を一覧化して", language=None)
+        # # 「社内問い合わせ」の機能説明
+        # st.markdown("**【「社内問い合わせ」を選択した場合】**")
+        # st.info("質問・要望に対して、社内文書の情報をもとに回答を得られます。")
+        # st.code("【入力例】\n人事部に所属している従業員情報を一覧化して", wrap_lines=True, language=None)
 
 
 def display_conversation_log():
@@ -119,9 +112,9 @@ def display_conversation_log():
                         # 参照元ドキュメントのページ番号が取得できた場合にのみ、ページ番号を表示
                         if "main_page_number" in message["content"]:
                             page_number = message["content"]["main_page_number"] + 1
-                            st.success(f"{message['content']['main_file_path']}（ページNo.{page_number}）",icon=icon)
+                            st.success(f"{message['content']['main_file_path']}（ページNo.{page_number}）", icon=icon)
                         else:
-                            st.success(f"{message['content']['main_file_path']}",icon=icon)
+                            st.success(f"{message['content']['main_file_path']}", icon=icon)
                         
                         # ==========================================
                         # ユーザー入力値と関連性が高いサブドキュメントのありかを表示
@@ -139,7 +132,7 @@ def display_conversation_log():
                                     page_number = sub_choice["page_number"] + 1
                                     st.info(f"{sub_choice['source']}（ページNo.{page_number}）",icon=icon)
                                 else:
-                                    st.info(f"{sub_choice['source']}",icon=icon)
+                                    st.info(f"{sub_choice['source']}", icon=icon)
                     # ファイルのありかの情報が取得できなかった場合、LLMからの回答のみ表示
                     else:
                         st.markdown(message["content"]["answer"])
@@ -253,7 +246,7 @@ def display_search_llm_response(llm_response):
                 else:
                     # 「サブドキュメントのファイルパス」を表示
                     st.info(f"{sub_choice['source']}", icon=icon)
-
+        
         # 表示用の会話ログに格納するためのデータを用意
         # - 「mode」: モード（「社内文書検索」or「社内問い合わせ」）
         # - 「main_message」: メインドキュメントの補足メッセージ
@@ -358,4 +351,3 @@ def display_contact_llm_response(llm_response):
         content["file_info_list"] = file_info_list
 
     return content
-

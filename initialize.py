@@ -121,7 +121,7 @@ def initialize_retriever():
     # 埋め込みモデルの用意
     embeddings = OpenAIEmbeddings()
     
-    # ----------------------------------------------------------------------
+        # ----------------------------------------------------------------------
     # RAGパラメータを環境変数（.env）から取得。設定がなければデフォルト値を使用
     # ----------------------------------------------------------------------
     rag_search_k = int(os.getenv("SEARCH_K", ct.SEARCH_K_DEFAULT))
@@ -144,6 +144,7 @@ def initialize_retriever():
 
     # ベクターストアを検索するRetrieverの作成
     st.session_state.retriever = db.as_retriever(search_kwargs={"k": rag_search_k})
+
 
 
 def initialize_session_state():

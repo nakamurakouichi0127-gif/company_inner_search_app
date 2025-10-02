@@ -47,10 +47,14 @@ TEMPERATURE = 0.5
 # RAG参照用のデータソース系
 # ==========================================
 RAG_TOP_FOLDER_PATH = "./data"
+
+CSV_MERGED_DOC_KEY = "is_csv_merged_and_skip_split"
+
 SUPPORTED_EXTENSIONS = {
     ".pdf": PyMuPDFLoader,
     ".docx": Docx2txtLoader,
-    ".csv": lambda path: CSVLoader(path, encoding="utf-8")
+    ".csv": lambda path: CSVLoader(path, encoding="utf-8"),
+    ".txt": lambda path: TextLoader(path, encoding="utf-8"),
 }
 WEB_URL_LOAD_TARGETS = [
     "https://generative-ai.web-camp.io/"

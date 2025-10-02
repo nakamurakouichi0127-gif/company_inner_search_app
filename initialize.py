@@ -20,6 +20,8 @@ from langchain_openai import OpenAIEmbeddings
 from langchain_community.vectorstores import Chroma
 import constants as ct
 
+from langchain.schema.document import Document
+
 
 ############################################################
 # 設定関連
@@ -117,7 +119,22 @@ def initialize_retriever():
         doc.page_content = adjust_string(doc.page_content)
         for key in doc.metadata:
             doc.metadata[key] = adjust_string(doc.metadata[key])
+
+    # ----------------------------------------------------------------------
+    # ★【新規】CSV統合ドキュメント（分割非対象）と、通常ドキュメント（分割対象）に分離する 251002
+    # ----------------------------------------------------------------------
+    docs_to_split = []      # 分割対象のドキュメント (PDF, DOCX, TXTなど)
+    docs_not_to_split = []  # 分割非対象のドキュメント (CSV統合ドキュメント)
+
+    for doc in docs_all:
+        # constants.pyで定義したキーを持ち、値がTrueのドキュメントは分割をスキップ
+        if doc.metadata.get(ct.CSV_MERGED_DOC_KEY, False):
+            docs_not_to_split.append(doc)
+        else:
+            docs_to_split.append(doc)
+    # ----------------------------------------------------------------------
     
+
     # 埋め込みモデルの用意
     embeddings = OpenAIEmbeddings()
     
@@ -136,11 +153,27 @@ def initialize_retriever():
         separator="\n"
     )
 
-    # チャンク分割を実施
-    splitted_docs = text_splitter.split_documents(docs_all)
+    # # チャンク分割を実施
+    # splitted_docs = text_splitter.split_documents(docs_all)
+
+    # # ベクターストアの作成
+    # db = Chroma.from_documents(splitted_docs, embedding=embeddings)
+
+    # ----------------------------------------------------------------------
+    # ★【変更】チャンク分割の対象を、分割対象ドキュメントのみに変更 251002
+    # ----------------------------------------------------------------------
+    # チャンク分割を実施 (分割対象のドキュメントのみを渡す)
+    texts = text_splitter.split_documents(docs_to_split) # 👈 docs_all から docs_to_split に変更
+
+    # ----------------------------------------------------------------------
+    # ★【新規】分割しなかったCSV統合ドキュメントをチャンクリストに結合する
+    # ----------------------------------------------------------------------
+    texts.extend(docs_not_to_split) # 👈 分割非対象のドキュメントをそのまま結合
 
     # ベクターストアの作成
-    db = Chroma.from_documents(splitted_docs, embedding=embeddings)
+    # 結合された最終的なチャンクリスト (texts) をベクターストアに格納
+    db = Chroma.from_documents(texts, embedding=embeddings) # 👈 splitted_docs から texts に変更
+
 
     # ベクターストアを検索するRetrieverの作成
     st.session_state.retriever = db.as_retriever(search_kwargs={"k": rag_search_k})
@@ -222,12 +255,48 @@ def file_load(path, docs_all):
     file_name = os.path.basename(path)
 
     # 想定していたファイル形式の場合のみ読み込む
+    # if file_extension in ct.SUPPORTED_EXTENSIONS:
+    #     # ファイルの拡張子に合ったdata loaderを使ってデータ読み込み
+    #     loader = ct.SUPPORTED_EXTENSIONS[file_extension](path)
+    #     docs = loader.load()
+    #     docs_all.extend(docs)
+    
     if file_extension in ct.SUPPORTED_EXTENSIONS:
         # ファイルの拡張子に合ったdata loaderを使ってデータ読み込み
-        loader = ct.SUPPORTED_EXTENSIONS[file_extension](path)
-        docs = loader.load()
-        docs_all.extend(docs)
+        # constants.pyでラムダ関数として登録したローダー関数を呼び出す
+        loader_function = ct.SUPPORTED_EXTENSIONS[file_extension]
+        docs = loader_function(path).load()
+        
+        # ==========================================================
+        # ★【CSV統合ロジック】CSVファイルの場合、行ごとに分割されたドキュメントを統合する
+        # ==========================================================
+        if file_extension == ".csv" and docs:
+            
+            # 1. 各行のテキスト内容（page_content）を改行で結合する
+            combined_text = "\n".join([doc.page_content for doc in docs])
 
+            # 2. 検索精度を上げるため、ファイル名と区切り文字を付けてテキストを調整
+            #    ファイル名や内容の種別を明記することで、Retrieverの関連性スコアを上げやすくする
+            header = f"【情報源ファイル】: {file_name}\n【データ内容】: 社員の全情報一覧\n---データ開始---\n"
+            final_content = header + combined_text
+            
+            # 3. 単一のDocumentオブジェクトとして再作成
+            #    元のファイルパスをメタデータに含める
+            metadata = docs[0].metadata
+            metadata['source'] = path
+
+            # CSV統合済みで分割処理をスキップしたことを示すフラグをメタデータに追加 251002
+            metadata[ct.CSV_MERGED_DOC_KEY] = True
+
+            # 新しい単一のDocumentを作成
+            single_doc = Document(page_content=final_content, metadata=metadata)
+            
+            # 統合された単一のドキュメントを docs_all に追加
+            docs_all.append(single_doc)
+            
+        else:
+            # CSV以外のファイル（PDF, DOCX, TXTなど）は、分割されたまま追加
+            docs_all.extend(docs)
 
 def adjust_string(s):
     """
